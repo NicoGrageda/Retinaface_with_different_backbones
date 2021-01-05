@@ -5,6 +5,7 @@ import torchvision.models._utils as _utils
 import torchvision.models as models
 import torch.nn.functional as F
 from torch.autograd import Variable
+import collections
 
 def conv_bn(inp, oup, stride = 1, leaky = 0):
     return nn.Sequential(
