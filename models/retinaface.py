@@ -83,7 +83,7 @@ class RetinaFace(nn.Module):
                 in_channels_stage2 * 8,
             ]
         else:
-            self.body = timm.create_model(cfg['name'], features_only=True, out_indices=(2, 5), pretrained=cfg['pretrain'])
+            self.body = timm.create_model(cfg['name'], features_only=True, out_indices=(cfg['return_layers']), pretrained=cfg['pretrain'])
             in_channels_list = self.body.feature_info.channels()
 
         out_channels = cfg['out_channel']
