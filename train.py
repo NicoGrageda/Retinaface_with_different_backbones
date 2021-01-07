@@ -81,7 +81,7 @@ cudnn.benchmark = True
 
 optimizer = optim.SGD(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
 criterion = MultiBoxLoss(num_classes, 0.35, True, 0, True, 7, 0.35, False)
-
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 priorbox = PriorBox(cfg, image_size=(img_dim, img_dim))
 with torch.no_grad():
     priors = priorbox.forward()
@@ -108,6 +108,8 @@ def train():
     for iteration in range(start_iter, max_iter):
         if iteration % epoch_size == 0:
             # create batch iterator
+            if iteration > start_iter:
+                scheduler.step()
             batch_iterator = iter(data.DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, collate_fn=detection_collate))
             if (epoch % 10 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
                 torch.save(net.state_dict(), save_folder + cfg['name']+ '_epoch_' + str(epoch) + '.pth')
@@ -116,7 +118,6 @@ def train():
         load_t0 = time.time()
         if iteration in stepvalues:
             step_index += 1
-        lr = adjust_learning_rate(optimizer, gamma, epoch, step_index, iteration, epoch_size)
 
         # load train data
         images, targets = next(batch_iterator)
@@ -138,6 +139,8 @@ def train():
         print('Epoch:{}/{} || Epochiter: {}/{} || Iter: {}/{} || Loc: {:.4f} Cla: {:.4f} Landm: {:.4f} || LR: {:.8f} || Batchtime: {:.4f} s || ETA: {}'
               .format(epoch, max_epoch, (iteration % epoch_size) + 1,
               epoch_size, iteration + 1, max_iter, loss_l.item(), loss_c.item(), loss_landm.item(), lr, batch_time, str(datetime.timedelta(seconds=eta))))
+
+            
 
     torch.save(net.state_dict(), save_folder + cfg['name'] + '_Final.pth')
     # torch.save(net.state_dict(), save_folder + 'Final_Retinaface.pth')
