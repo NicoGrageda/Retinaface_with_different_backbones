@@ -59,3 +59,22 @@ cfg_effB0 = {
     'in_channel': None,
     'out_channel': 64
 }
+cfg_mnetv3 = {
+    'name': 'mobilenetv3_large_100',
+    'min_sizes': [[16, 32], [64, 128], [256, 512]],
+    'steps': [8, 16, 32],
+    'variance': [0.1, 0.2],
+    'clip': False,
+    'loc_weight': 2.0,
+    'gpu_train': True,
+    'batch_size': 32,
+    'ngpu': 1,
+    'epoch': 250,
+    'decay1': 190,
+    'decay2': 220,
+    'image_size': 640,
+    'pretrain': True,
+    'return_layers': {2,3,4},
+    'in_channel': None,
+    'out_channel': 64
+}
