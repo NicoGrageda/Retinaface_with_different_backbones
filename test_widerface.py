@@ -4,7 +4,7 @@ import argparse
 import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
-from data import cfg_mnet, cfg_re50
+from data import cfg_mnet, cfg_re50, cfg
 from layers.functions.prior_box import PriorBox
 from utils.nms.py_cpu_nms import py_cpu_nms
 import cv2
@@ -64,7 +64,10 @@ def load_model(model, pretrained_path, load_to_cpu):
     check_keys(model, pretrained_dict)
     model.load_state_dict(pretrained_dict, strict=False)
     return model
-
+def transform(h, w):
+  img_h_new, img_w_new = int(np.ceil(h/32)*32), int(np.ceil(w/32)*32)
+  scale_h, scale_w = img_h_new / h, img_w_new/ w
+  return img_h_new, img_w_new, scale_h, scale_w
 
 if __name__ == '__main__':
     torch.set_grad_enabled(False)
@@ -114,7 +117,10 @@ if __name__ == '__main__':
             resize = 1
 
         if resize != 1:
-            img = cv2.resize(img, None, None, fx=resize, fy=resize, interpolation=cv2.INTER_LINEAR)
+            h, w, sh, sw = transform(img_raw.shape[0], img_raw.shape[1])
+            resize=sh
+            img = cv2.resize(img_raw, None, None, fx=sw, fy=sh, interpolation=cv2.INTER_LINEAR)
+            img = np.float32(img)
         im_height, im_width, _ = img.shape
         scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
         img -= (104, 117, 123)
