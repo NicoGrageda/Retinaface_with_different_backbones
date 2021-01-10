@@ -36,6 +36,8 @@ elif args.network == "resnet50":
     cfg = cfg_re50
 elif args.network == "efficientnet_b0":
     cfg = cfg_effB0
+elif args.network == "mobilenetv3_large_100":
+    cfg = cfg_mnetv3
 rgb_mean = (104, 117, 123) # bgr order
 num_classes = 2
 img_dim = cfg['image_size']
