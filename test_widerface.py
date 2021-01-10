@@ -77,6 +77,11 @@ if __name__ == '__main__':
         cfg = cfg_mnet
     elif args.network == "resnet50":
         cfg = cfg_re50
+    elif args.network == "efficientnet_b0":
+        cfg = cfg_effB0
+    elif args.network == "mobilenetv3_large_100":
+        cfg = cfg_mnetv3
+       
     # net and model
     net = RetinaFace(cfg=cfg, phase = 'test')
     net = load_model(net, args.trained_model, args.cpu)
