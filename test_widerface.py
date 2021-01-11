@@ -18,7 +18,7 @@ parser.add_argument('-m', '--trained_model', default='./weights/Resnet50_Final.p
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--network', default='resnet50', help='Backbone network mobile0.25 or resnet50')
 parser.add_argument('--origin_size', default=True, type=str, help='Whether use origin image size to evaluate')
-parser.add_argument('--save_folder', default='./widerface_evaluate/widerface_txt/', type=str, help='Dir to save txt results')
+parser.add_argument('--save_folder', default='./widerface_evaluate/', type=str, help='Dir to save txt results')
 parser.add_argument('--cpu', action="store_true", default=False, help='Use cpu inference')
 parser.add_argument('--dataset_folder', default='./data/widerface/val/images/', type=str, help='dataset path')
 parser.add_argument('--confidence_threshold', default=0.02, type=float, help='confidence_threshold')
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         _t['misc'].toc()
 
         # --------------------------------------------------------------------
-        save_name = args.save_folder + img_name[:-4] + ".txt"
+        save_name = args.save_folder + 'widerface_txt_' + args.network + "_" + args.trained_model[-9:-4] + "/" + img_name[:-4] + ".txt"
         dirname = os.path.dirname(save_name)
         if not os.path.isdir(dirname):
             os.makedirs(dirname)
