@@ -90,6 +90,7 @@ with torch.no_grad():
     priors = priors.cuda()
 
 def train():
+    lf = open("log_file_" + cfg['network'] + ".txt", "a")
     net.train()
     epoch = 0 + args.resume_epoch
     print('Loading Dataset...')
@@ -138,6 +139,8 @@ def train():
         load_t1 = time.time()
         batch_time = load_t1 - load_t0
         eta = int(batch_time * (max_iter - iteration))
+        lf.write('Epoch:{}/{} || Epochiter: {}/{} || Iter: {}/{} || Loc: {:.4f} Cla: {:.4f} Landm: {:.4f} || LR: {:.8f} || Batchtime: {:.4f} s || ETA: {} \n\n'.format(epoch, max_epoch, (iteration % epoch_size) + 1,
+              epoch_size, iteration + 1, max_iter, loss_l.item(), loss_c.item(), loss_landm.item(), scheduler.get_last_lr()[0], batch_time, str(datetime.timedelta(seconds=eta))))
         print('Epoch:{}/{} || Epochiter: {}/{} || Iter: {}/{} || Loc: {:.4f} Cla: {:.4f} Landm: {:.4f} || LR: {:.8f} || Batchtime: {:.4f} s || ETA: {}'
               .format(epoch, max_epoch, (iteration % epoch_size) + 1,
               epoch_size, iteration + 1, max_iter, loss_l.item(), loss_c.item(), loss_landm.item(), scheduler.get_last_lr()[0], batch_time, str(datetime.timedelta(seconds=eta))))
@@ -146,6 +149,7 @@ def train():
 
     torch.save(net.state_dict(), save_folder + cfg['name'] + '_Final.pth')
     # torch.save(net.state_dict(), save_folder + 'Final_Retinaface.pth')
+    lf.close()
 
 
 def adjust_learning_rate(optimizer, gamma, epoch, step_index, iteration, epoch_size):
