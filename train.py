@@ -90,7 +90,7 @@ with torch.no_grad():
     priors = priors.cuda()
 
 def train():
-    lf = open("log_file_" + cfg['network'] + ".txt", "a")
+    lf = open("log_file_" + cfg['name'] + ".txt", "a")
     net.train()
     epoch = 0 + args.resume_epoch
     print('Loading Dataset...')
