@@ -2,6 +2,8 @@ from __future__ import print_function
 import os
 import torch
 import torch.optim as optim
+from adamp import AdamP
+from adamp import SGDP
 import torch.backends.cudnn as cudnn
 import argparse
 import torch.utils.data as data
@@ -24,6 +26,7 @@ parser.add_argument('--resume_epoch', default=0, type=int, help='resume iter for
 parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight decay for SGD')
 parser.add_argument('--gamma', default=0.1, type=float, help='Gamma update for SGD')
 parser.add_argument('--save_folder', default='./weights/', help='Location to save checkpoint models')
+parser.add_argument('--optimizer', default='SDG', help='Type of optimezer used to train (SGD, SGDP, AdamP)')
 
 args = parser.parse_args()
 
@@ -79,9 +82,18 @@ else:
     net = net.cuda()
 
 cudnn.benchmark = True
+scheduler_flag=True
+if args.optimizer=="SGD":
+    optimizer = optim.SGD(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
+elif args.optimizer=="SGDP":
+    optimizer = SGDP(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
+elif args.optimizer=="AdamP":
+    optimizer = AdamP(net.parameters(), lr=initial_lr, betas=(0.9, 0.999), weight_decay=weight_decay)
+    scheduler_flag=False
+else args.optimizer=="Adam":
+    optimizer = optim.Adam(net.parameters(), lr=initial_lr, betas=(0.9, 0.999), weight_decay=weight_decay)
+    scheduler_flag=False
 
-
-optimizer = optim.SGD(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
 criterion = MultiBoxLoss(num_classes, 0.35, True, 0, True, 7, 0.35, False)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 priorbox = PriorBox(cfg, image_size=(img_dim, img_dim))
@@ -111,7 +123,7 @@ def train():
     for iteration in range(start_iter, max_iter):
         if iteration % epoch_size == 0:
             # create batch iterator
-            if iteration > start_iter:
+            if iteration > start_iter and scheduler_flag:
                 scheduler.step()
             batch_iterator = iter(data.DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, collate_fn=detection_collate))
             if (epoch % 10 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
