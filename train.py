@@ -84,17 +84,13 @@ else:
 cudnn.benchmark = True
 scheduler_flag=True
 if args.optimizer=="SGD":
-    print("Training with SGD")
     optimizer = optim.SGD(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
 elif args.optimizer=="SGDP":
-    print("Training with SGDP")
     optimizer = SGDP(net.parameters(), lr=initial_lr, momentum=momentum, weight_decay=weight_decay)
 elif args.optimizer=="AdamP":
-    print("Training with AdamP")
     optimizer = AdamP(net.parameters(), lr=initial_lr, betas=(0.9, 0.999), weight_decay=weight_decay)
     scheduler_flag=False
 else:
-    print("Training with Adam")
     optimizer = optim.Adam(net.parameters(), lr=initial_lr, betas=(0.9, 0.999), weight_decay=weight_decay)
     scheduler_flag=False
 
@@ -106,7 +102,7 @@ with torch.no_grad():
     priors = priors.cuda()
 
 def train():
-    lf = open("log_file_" + cfg['name'] + ".txt", "a")
+    lf = open("log_file_" + cfg['name']+"_"+ args.optimizer + ".txt", "a")
     net.train()
     epoch = 0 + args.resume_epoch
     print('Loading Dataset...')
@@ -131,7 +127,7 @@ def train():
                 scheduler.step()
             batch_iterator = iter(data.DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, collate_fn=detection_collate))
             if (epoch % 10 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
-                torch.save(net.state_dict(), save_folder + cfg['name']+'_optimizer_'+args.optimizer+ '_epoch_' + str(epoch) + '.pth')
+                torch.save(net.state_dict(), save_folder + cfg['name']+ '_epoch_' + str(epoch) + '.pth')
             epoch += 1
 
         load_t0 = time.time()
