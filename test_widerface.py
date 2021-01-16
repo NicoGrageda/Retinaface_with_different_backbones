@@ -182,7 +182,7 @@ if __name__ == '__main__':
         _t['misc'].toc()
 
         # --------------------------------------------------------------------
-        save_name = args.save_folder + 'widerface_txt_' + args.network + "_" + args.trained_model[-9:-4] + "/" + img_name[:-4] + ".txt"
+        save_name = args.save_folder + 'widerface_txt_' + args.network + "_" + args.trained_model[-17:-4] + "/" + img_name[:-4] + ".txt"
         dirname = os.path.dirname(save_name)
         if not os.path.isdir(dirname):
             os.makedirs(dirname)
