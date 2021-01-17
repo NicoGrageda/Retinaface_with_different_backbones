@@ -67,9 +67,13 @@ if __name__ == '__main__':
     torch.set_grad_enabled(False)
     cfg = None
     if args.network == "mobile0.25":
-        cfg = cfg_mnet
+      cfg = cfg_mnet
     elif args.network == "resnet50":
-        cfg = cfg_re50
+      cfg = cfg_re50
+    elif args.network == "efficientnet_b0":
+      cfg = cfg_effB0
+    elif args.network == "mobilenetv3_large_100":
+      cfg = cfg_mnetv3
     # net and model
     net = RetinaFace(cfg=cfg, phase = 'test')
     net = load_model(net, args.trained_model, args.cpu)
@@ -163,6 +167,6 @@ if __name__ == '__main__':
                 cv2.circle(img_raw, (b[13], b[14]), 1, (255, 0, 0), 4)
             # save image
 
-            name = "test.jpg"
+            name = "test"+args.trained_model[10:-4]+".jpg"
             cv2.imwrite(name, img_raw)
 
